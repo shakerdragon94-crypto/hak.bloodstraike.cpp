@@ -35,4 +35,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bloodstrike-so-library
-          path: build/libbloodstrike_mod.so
+          path: build/*.so
