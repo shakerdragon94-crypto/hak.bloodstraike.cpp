@@ -11,7 +11,6 @@ jobs:
 
       - name: Setup Android NDK
         run: |
-          echo "Downloading NDK..."
           wget -q https://dl.google.com/android/repository/android-ndk-r26b-linux.zip
           unzip -q android-ndk-r26b-linux.zip
           echo "ANDROID_NDK_HOME=$PWD/android-ndk-r26b" >> $GITHUB_ENV
@@ -19,24 +18,15 @@ jobs:
       - name: Compile Library
         run: |
           export NDK_HOME=$PWD/android-ndk-r26b
-          if [ -f "jni/Android.mk" ]; then
-            $NDK_HOME/ndk-build
-          elif [ -f "CMakeLists.txt" ]; then
-            mkdir build && cd build
-            cmake -DCMAKE_TOOLCHAIN_FILE=$NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 ..
-            make
-          else
-            echo "Searching for source files to compile..."
-            mkdir -p build && cd build
-            $NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++ -shared -fPIC ../*.cpp -o libbloodstrike.so || true
-          fi
+          mkdir -p build && cd build
+          $NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++ -shared -fPIC ../*.cpp -o hak.bloodstraik.so || {
+            echo "Direct compilation failed, trying alternative path..."
+            $NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++ -shared -fPIC ../app/src/main/cpp/*.cpp -o hak.bloodstraik.so
+          }
+          mv hak.bloodstraik.so ../
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: bloodstrike-so-library
-          path: |
-            *.so
-            libs/**/*.so
-            obj/**/*.so
-            build/**/*.so
+          path: hak.bloodstraik.so
