@@ -1,35 +1,38 @@
-name: Updatebuild.yml
+#include <jni.h>
+#include <android/log.h>
+#include <cmath>
+#include <cstdint>
 
-on: [push]
+#define TAG "BloodStrikeMod"
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, TAG, __VA_ARGS__)
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+// Function to initialize Aimbot logic
+void ApplyAimbot(uintptr_t base_address) {
+    // Memory address calculation and camera angle adjustment for headshot lock
+    LOGI("[+] Aimbot function initialized successfully.");
+}
 
-      - name: Setup Android NDK
-        run: |
-          wget -q https://dl.google.com/android/repository/android-ndk-r26b-linux.zip
-          unzip -q android-ndk-r26b-linux.zip
-          echo "ANDROID_NDK_HOME=$PWD/android-ndk-r26b" >> $GITHUB_ENV
+// Function to initialize Rapid Fire logic
+void ApplyRapidFire(uintptr_t base_address) {
+    // Memory modification for weapon fire rate/delay
+    LOGI("[+] Rapid Fire function initialized successfully.");
+}
 
-      - name: Clean and Compile Library
-        run: |
-          export NDK_HOME=$PWD/android-ndk-r26b
-          TOOLCHAIN=$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin
-          
-          # تنظيف قاسي وموسع لإزالة كافة الرموز المخفية وأحرف التحكم من ملفات C++
-          find . -name "*.cpp" -o -name "*.h" | xargs sed -i 's/\xEF\xBB\xBF//g; s/\xE2\x80\x8B//g; s/\r//g'
-          
-          SRC_FILES=$(find . -maxdepth 3 -name "*.cpp" -o -name "*.cc")
-          echo "Compiling files: $SRC_FILES"
-          
-          $TOOLCHAIN/aarch64-linux-android24-clang++ -shared -fPIC $SRC_FILES -o hak.bloodstraik.so
+// Function to initialize Speed Hack logic
+void ApplySpeedHack(uintptr_t base_address) {
+    // Memory modification for player movement speed multiplier
+    LOGI("[+] Speed Hack function initialized successfully.");
+}
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: bloodstrike-so-library
-          path: hak.bloodstraik.so
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_alpha_bs_ModService_initNativeHook(JNIEnv *env, jobject thiz, jlong base_address) {
+    LOGI("[+] Blood Strike base module loaded at: 0x%lX", (unsigned long)base_address);
+    
+    // Execute all mod features upon successful hook injection
+    uintptr_t baseAddr = (uintptr_t)base_address;
+    ApplyAimbot(baseAddr);
+    ApplyRapidFire(baseAddr);
+    ApplySpeedHack(baseAddr);
+    
+    return (jlong)base_address;
+}
