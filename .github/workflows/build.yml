@@ -6,21 +6,15 @@
 #define TAG "BloodStrikeMod"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, TAG, __VA_ARGS__)
 
-// Function to initialize Aimbot logic
 void ApplyAimbot(uintptr_t base_address) {
-    // Memory address calculation and camera angle adjustment for headshot lock
     LOGI("[+] Aimbot function initialized successfully.");
 }
 
-// Function to initialize Rapid Fire logic
 void ApplyRapidFire(uintptr_t base_address) {
-    // Memory modification for weapon fire rate/delay
     LOGI("[+] Rapid Fire function initialized successfully.");
 }
 
-// Function to initialize Speed Hack logic
 void ApplySpeedHack(uintptr_t base_address) {
-    // Memory modification for player movement speed multiplier
     LOGI("[+] Speed Hack function initialized successfully.");
 }
 
@@ -28,7 +22,6 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_com_alpha_bs_ModService_initNativeHook(JNIEnv *env, jobject thiz, jlong base_address) {
     LOGI("[+] Blood Strike base module loaded at: 0x%lX", (unsigned long)base_address);
     
-    // Execute all mod features upon successful hook injection
     uintptr_t baseAddr = (uintptr_t)base_address;
     ApplyAimbot(baseAddr);
     ApplyRapidFire(baseAddr);
