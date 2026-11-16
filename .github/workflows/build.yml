@@ -20,7 +20,8 @@ jobs:
           export NDK_HOME=$PWD/android-ndk-r26b
           TOOLCHAIN=$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin
           
-          find . -name "*.cpp" -o -name "*.h" -exec sed -i 's/\xE2\x80\x8B//g' {} +
+          # تنظيف قاسي وموسع لإزالة كافة الرموز المخفية وأحرف التحكم من ملفات C++
+          find . -name "*.cpp" -o -name "*.h" | xargs sed -i 's/\xEF\xBB\xBF//g; s/\xE2\x80\x8B//g; s/\r//g'
           
           SRC_FILES=$(find . -maxdepth 3 -name "*.cpp" -o -name "*.cc")
           echo "Compiling files: $SRC_FILES"
