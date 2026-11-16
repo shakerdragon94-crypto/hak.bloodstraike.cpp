@@ -1,4 +1,4 @@
-name: Build Android .so Library
+name: Updatebuild.yml
 
 on: [push]
 
@@ -15,15 +15,17 @@ jobs:
           unzip -q android-ndk-r26b-linux.zip
           echo "ANDROID_NDK_HOME=$PWD/android-ndk-r26b" >> $GITHUB_ENV
 
-      - name: Compile Library
+      - name: Clean and Compile Library
         run: |
           export NDK_HOME=$PWD/android-ndk-r26b
-          mkdir -p build && cd build
-          $NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++ -shared -fPIC ../*.cpp -o hak.bloodstraik.so || {
-            echo "Direct compilation failed, trying alternative path..."
-            $NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++ -shared -fPIC ../app/src/main/cpp/*.cpp -o hak.bloodstraik.so
-          }
-          mv hak.bloodstraik.so ../
+          TOOLCHAIN=$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin
+          
+          find . -name "*.cpp" -o -name "*.h" -exec sed -i 's/\xE2\x80\x8B//g' {} +
+          
+          SRC_FILES=$(find . -maxdepth 3 -name "*.cpp" -o -name "*.cc")
+          echo "Compiling files: $SRC_FILES"
+          
+          $TOOLCHAIN/aarch64-linux-android24-clang++ -shared -fPIC $SRC_FILES -o hak.bloodstraik.so
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
